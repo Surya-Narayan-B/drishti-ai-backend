@@ -1,0 +1,677 @@
+/* --- CSS Variables for Theming --- */
+body {
+    /* Light Theme (Default) */
+    --bg-body: #f8fafc;
+    --bg-main: #f8fafc;
+    --bg-sidebar: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f8fafc;
+    --bg-bot-message: #f1f5f9;
+    --bg-input: #ffffff;
+    --bg-toggle-slider: #ccc;
+    --bg-toggle-slider-checked: #3b82f6;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-tertiary: #475569;
+    --text-on-primary-btn: #ffffff;
+    --border-primary: #e2e8f0;
+    --border-input: #d1d5db;
+    --primary-btn-bg: #2563eb;
+    --danger-btn-bg: #ef4444;
+    --secondary-btn-bg: #fff;
+    --secondary-btn-text: #334155;
+    --modal-overlay: rgba(0, 0, 0, 0.5);
+    --modal-bg: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+    --shadow-hover: rgba(0,0,0,0.05);
+    --shadow-primary-btn-hover: rgba(37, 99, 235, 0.15);
+    --shadow-danger-btn-hover: rgba(239, 68, 68, 0.15);
+    --chat-submit-bg: #2563eb;
+    --chat-submit-icon: #ffffff;
+    --tab-link-active-border: #2563eb;
+    --status-good-color: #16a34a;
+    --status-warning-color: #f97316;
+    --status-bad-color: #ef4444;
+
+
+    /* Transitions for smooth theme changes */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode {
+    /* Dark Theme Overrides */
+    --bg-body: #111827;
+    --bg-main: #1f2937;
+    --bg-sidebar: #111827;
+    --bg-card: #374151;
+    --bg-card-hover: #4b5563;
+    --bg-bot-message: #4b5563;
+    --bg-input: #4b5563;
+    --bg-toggle-slider: #4b5563;
+    --bg-toggle-slider-checked: #60a5fa;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-tertiary: #9ca3af;
+    --text-on-primary-btn: #ffffff;
+    --border-primary: #4b5563;
+    --border-input: #6b7280;
+    --primary-btn-bg: #3b82f6;
+    --danger-btn-bg: #f87171;
+    --secondary-btn-bg: #4b5563;
+    --secondary-btn-text: #f9fafb;
+    --modal-overlay: rgba(0, 0, 0, 0.7);
+    --modal-bg: #1f2937;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --shadow-hover: rgba(255,255,255,0.1);
+    --shadow-primary-btn-hover: rgba(59, 130, 246, 0.25);
+    --shadow-danger-btn-hover: rgba(248, 113, 113, 0.25);
+    --chat-submit-bg: #3b82f6;
+    --chat-submit-icon: #ffffff;
+    --tab-link-active-border: #60a5fa;
+    --status-good-color: #4ade80;
+    --status-warning-color: #fb923c;
+    --status-bad-color: #f87171;
+}
+
+
+/* --- General Body and Font Styles --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-secondary);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Main Layout --- */
+.dashboard-container {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.main-content {
+    padding: 2rem 3rem;
+    overflow-y: auto;
+    background-color: var(--bg-main);
+}
+
+/* --- Header --- */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-primary);
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+header p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+
+/* --- General Button Styles --- */
+.primary-btn, .danger-btn, .secondary-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primary-btn:hover, .danger-btn:hover, .secondary-btn:hover {
+    transform: scale(1.05);
+}
+
+.primary-btn {
+    background-color: var(--primary-btn-bg);
+    color: var(--text-on-primary-btn);
+}
+
+.primary-btn:hover {
+    box-shadow: 0 8px 25px var(--shadow-primary-btn-hover);
+}
+
+.danger-btn {
+    background-color: var(--danger-btn-bg);
+    color: var(--text-on-primary-btn);
+}
+
+.danger-btn:hover {
+    box-shadow: 0 8px 25px var(--shadow-danger-btn-hover);
+}
+
+.secondary-btn {
+    background-color: var(--secondary-btn-bg);
+    color: var(--secondary-btn-text);
+    border: 1px solid var(--border-primary);
+}
+
+.secondary-btn:hover {
+    background-color: var(--bg-card-hover);
+    box-shadow: 0 1px 3px var(--shadow-hover);
+}
+
+.icon-btn {
+    padding: 0.5rem;
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+#theme-toggle-btn {
+    background-color: var(--secondary-btn-bg);
+    color: var(--secondary-btn-text);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    padding: 0.5rem;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+#theme-toggle-btn:hover {
+    background-color: var(--bg-card-hover);
+    box-shadow: 0 1px 3px var(--shadow-hover);
+}
+
+
+/* --- Idle & Live View Containers --- */
+.hidden {
+    display: none !important;
+}
+
+/* --- Card Styles --- */
+.start-session-card, .summary-card, .chart-card, .stat-card, .chart-container {
+    background-color: var(--bg-card);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transition: background-color 0.3s ease;
+}
+
+.start-session-card {
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.summary-grid.three-cards {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.summary-card {
+    padding: 1.5rem;
+}
+
+.summary-card h3 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    margin: 0 0 0.5rem 0;
+}
+
+.summary-card p {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.goal-indicator {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.chart-card {
+    padding: 1.5rem;
+    height: 300px;
+    position: relative;
+}
+
+.chart-card h3 {
+    text-align: center;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.live-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.stat-card h2 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-tertiary);
+    margin: 0 0 0.5rem 0;
+}
+
+.stat-card p {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.chart-container {
+    padding: 1.5rem;
+    height: 300px;
+}
+
+.chart-container h2 {
+    text-align: center;
+    margin: 0 0 1.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.session-controls {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+/* --- Chatbot Sidebar --- */
+.chatbot-sidebar {
+    background-color: var(--bg-sidebar);
+    border-left: 1px solid var(--border-primary);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.chatbot-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.chatbot-header h2 {
+    text-align: center;
+    font-size: 1.25rem;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.chat-messages {
+    flex-grow: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.message {
+    margin-bottom: 1rem;
+    max-width: 85%;
+}
+
+.bot-message {
+    background-color: var(--bg-bot-message);
+    color: var(--text-primary);
+    padding: 0.75rem 1rem;
+    border-radius: 12px 12px 12px 0;
+    align-self: flex-start;
+}
+
+.chat-form {
+    display: flex;
+    padding: 1rem;
+    border-top: 1px solid var(--border-primary);
+}
+
+#chat-input {
+    flex-grow: 1;
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    margin-right: 0.5rem;
+}
+
+.chat-form button {
+    background-color: var(--chat-submit-bg);
+    border: none;
+    border-radius: 8px;
+    color: var(--chat-submit-icon);
+    padding: 0.75rem;
+    cursor: pointer;
+}
+
+/* --- Modal Styles --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--modal-overlay);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: var(--modal-bg);
+    color: var(--text-primary);
+    padding: 2rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+/* --- Settings Modal Styles --- */
+.settings-modal-content {
+    max-width: 680px;
+}
+
+.tab-nav {
+    display: flex;
+    border-bottom: 1px solid var(--border-primary);
+    margin-bottom: 1.5rem;
+}
+
+.tab-link {
+    background: none;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    border-bottom: 3px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.tab-link.active {
+    color: var(--text-primary);
+    font-weight: 500;
+    border-bottom-color: var(--tab-link-active-border);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+fieldset {
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    padding: 0.85rem;
+    margin-bottom: 0.70rem;
+}
+
+legend {
+    padding: 0 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-tertiary);
+}
+
+.form-group input[type="number"],
+.form-group input[type="time"],
+.form-group select,
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-input);
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 1rem;
+    box-sizing: border-box; /* Ensures padding doesn't add to width */
+}
+
+.form-group-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.form-group-checkbox input[type="checkbox"] {
+    width: 1.25em;
+    height: 1.25em;
+    margin-right: 0.75rem;
+}
+
+.form-group-checkbox label {
+    color: var(--text-tertiary);
+}
+
+.form-group-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form-group-inline {
+    display: flex;
+    gap: 1.5rem;
+}
+.form-group-inline .form-group {
+    flex: 1;
+}
+
+.full-width {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-primary);
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+    text-align: right;
+}
+
+/* Custom Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-toggle-slider);
+  transition: .4s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+input:checked + .slider {
+  background-color: var(--bg-toggle-slider-checked);
+}
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--bg-toggle-slider-checked);
+}
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+.slider.round {
+  border-radius: 34px;
+}
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* --- Session Report Modal Styles --- */
+#session-report-loader {
+    text-align: center;
+    padding: 3rem 0;
+}
+
+.spinner {
+    border: 4px solid var(--border-primary);
+    border-top: 4px solid var(--primary-btn-bg);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 1rem auto 0;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#session-report-content hr {
+    border: none;
+    border-top: 1px solid var(--border-primary);
+    margin: 1.5rem 0;
+}
+
+#session-report-content h3 {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.report-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.25rem;
+}
+
+.report-item-icon {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    margin-top: -0.25rem;
+}
+
+.report-item-details {
+    flex-grow: 1;
+}
+
+.report-item-label {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.report-item-value {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.report-item-insight {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    font-style: italic;
+}
+
+/* Status Colors */
+.status-good { color: var(--status-good-color); }
+.status-warning { color: var(--status-warning-color); }
+.status-bad { color: var(--status-bad-color); }
+
+/* --- Fix for Settings Modal Checkbox Alignment --- */
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* Creates two equal columns */
+    gap: 0 1rem; /* Adds a small gap between the columns */
+}
+
+/* === NEW: Calibration Modal Styles === */
+#calibration-modal .modal-content {
+    max-width: 550px;
+    text-align: center;
+}
+
+#calibration-modal p {
+    line-height: 1.6;
+}
+
+#calibration-status {
+    margin: 1.5rem 0;
+    font-weight: 500;
+    color: var(--text-primary);
+    min-height: 1.2em; /* Prevents layout shift when text appears */
+}

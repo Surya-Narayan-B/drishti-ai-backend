@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrishtiAI Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Main Content Area (Left Side) -->
+        <main class="main-content">
+            <header>
+                <div class="header-content">
+                    <h1>Your Wellness Dashboard</h1>
+                    <p id="header-subtitle">Review your habits or start a new session.</p>
+                </div>
+                <div class="header-buttons">
+                    <button id="view-report-btn" class="secondary-btn">View Weekly Report</button>
+                    <button id="theme-toggle-btn">🌗</button>
+                    <button id="settings-btn" class="secondary-btn icon-btn">⚙️</button>
+                </div>
+            </header>
+
+            <!-- IDLE / SUMMARY VIEW (Visible by default) -->
+            <div id="idle-view">
+                <div class="start-session-card">
+                    <h2>Ready to Begin?</h2>
+                    <p>Start monitoring to see your live eye health metrics.</p>
+                    <button id="start-session-btn" class="primary-btn">Start Monitoring Session</button>
+                </div>
+                <div class="summary-grid three-cards">
+                    <div class="summary-card">
+                        <h3>Screen Health Score</h3>
+                        <p id="health-score">-- / 100</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Average Blink Rate</h3>
+                        <p id="avg-blink-rate">-- BPM</p>
+                        <span id="blink-rate-goal" class="goal-indicator"></span> 
+                    </div>
+                    <div class="summary-card">
+                        <h3>Current Streak</h3>
+                        <p id="current-streak">🔥 -- Days</p>
+                    </div>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Fatigue Hotspots</h3>
+                        <canvas id="fatigueHotspotsChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Activity Clock</h3>
+                        <canvas id="activityClockChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LIVE MONITORING VIEW (Hidden by default) -->
+            <div id="live-view" class="hidden">
+                    <div class="live-stats-grid">
+                        <div class="stat-card">
+                            <h2>Total Blinks</h2>
+                            <p id="total-blinks">--</p>
+                        </div>
+                        <div class="stat-card">
+                            <h2>Active Time</h2>
+                            <p id="active-time">--</p>
+                        </div>
+                        <div class="stat-card">
+                            <h2>Fatigue Score</h2>
+                            <p><span id="fatigue-score-value">0</span></p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h2>Live Blink Rate (BPM)</h2>
+                        <canvas id="liveBlinkChart"></canvas>
+                    </div>
+                    <div class="session-controls">
+                        <button id="stop-session-btn" class="danger-btn">Stop Session</button>
+                    </div>
+            </div>
+        </main>
+
+        <!-- Chatbot Sidebar (Right Side) -->
+        <aside class="chatbot-sidebar">
+            <div class="chatbot-header">
+                <h2>DrishtiAI</h2>
+            </div>
+            <div id="chat-messages" class="chat-messages">
+                <div class="message bot-message">
+                    <p>Hello! Ask me for a wellness tip or about your stats.</p>
+                </div>
+            </div>
+            <form id="chat-form" class="chat-form">
+                <input type="text" id="chat-input" placeholder="Ask a question..." autocomplete="off" required>
+                <button type="submit" aria-label="Send message">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </form>
+        </aside>
+    </div>
+
+    <!-- Weekly Report Modal (Hidden by default) -->
+    <div id="report-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button id="close-modal-btn" class="close-btn">&times;</button>
+            <h2>Your Weekly Wellness Report</h2>
+            <p id="report-date-range">July 27, 2025 - August 2, 2025</p>
+            <div class="report-summary"></div>
+            <canvas id="weeklyReportChart"></canvas>
+        </div>
+    </div>
+
+    <!-- SETTINGS MODAL STRUCTURE -->
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-content settings-modal-content">
+            <button id="close-settings-modal-btn" class="close-btn">&times;</button>
+            <h2>Settings</h2>
+            <div class="tab-nav">
+                <button class="tab-link active" data-tab="tab-goals">Goals & Personalization</button>
+                <button class="tab-link" data-tab="tab-notifications">Notifications & Schedule</button>
+                <button class="tab-link" data-tab="tab-data">Data & Reset</button>
+            </div>
+            <div class="tab-content-container">
+                <div id="tab-goals" class="tab-content active">
+                    <!-- === NEW: Name input added to Settings === -->
+                    <fieldset>
+                        <legend>Personalization</legend>
+                        <div class="form-group">
+                            <label for="user-name-settings">Your Name</label>
+                            <input type="text" id="user-name-settings" placeholder="e.g., Alex">
+                        </div>
+                        <div class="form-group-checkbox"><input type="checkbox" id="enable-weekly-goals"><label for="enable-weekly-goals">Enable Weekly Progress Goals</label></div>
+                        <div class="form-group-checkbox"><input type="checkbox" id="enable-daily-streak"><label for="enable-daily-streak">Enable daily streak tracking</label></div>
+                    </fieldset>
+                    <fieldset><legend>Weekly Goals</legend><div class="form-group"><label for="goal-blink-rate">Target Average Blink Rate (BPM)</label><input type="number" id="goal-blink-rate" placeholder="e.g., 20"></div><div class="form-group"><label for="goal-breaks">Target Breaks Per Day</label><input type="number" id="goal-breaks" placeholder="e.g., 5"></div></fieldset>
+                </div>
+                <div id="tab-notifications" class="tab-content" style="display: none;">
+                    <fieldset><legend>Master Toggle</legend><div class="form-group-toggle"><label for="master-notifications">Enable All Notifications</label><label class="switch"><input type="checkbox" id="master-notifications"><span class="slider round"></span></label></div></fieldset>
+                    <fieldset><legend>Notification Types</legend><div class="checkbox-grid"><div class="form-group-checkbox"><input type="checkbox" id="notify-blink"><label for="notify-blink">Blink Reminders</label></div><div class="form-group-checkbox"><input type="checkbox" id="notify-break"><label for="notify-break">Break Time Alerts</label></div></div></fieldset>
+                    <fieldset><legend>Notification Frequency</legend><div class="form-group"><label for="notify-frequency">Remind me every:</label><select id="notify-frequency"><option value="20">20 minutes</option><option value="30" selected>30 minutes</option><option value="60">1 hour</option></select></div></fieldset>
+                    <fieldset><legend>Active Hours</legend><div class="form-group-inline"><div class="form-group"><label for="active-start-time">Start Time</label><input type="time" id="active-start-time" value="09:00"></div><div class="form-group"><label for="active-end-time">End Time</label><input type="time" id="active-end-time" value="17:00"></div></div></fieldset>
+                </div>
+                <div id="tab-data" class="tab-content" style="display: none;">
+                    <fieldset><legend>Actions</legend>
+                        <div class="form-group">
+                            <p>Use these actions to manage your application data.</p>
+                            <button id="reset-goals-btn" class="secondary-btn full-width">Reset Goals to Default</button>
+                            <button id="clear-data-btn" class="danger-btn full-width">Clear All Preferences & History</button>
+                        </div>
+                        <div class="form-group">
+                            <label>Vision Profile</label>
+                            <p>Do this if you change your lighting, seating position, or start wearing glasses.</p>
+                            <button id="recalibrate-btn" class="secondary-btn full-width">Re-Calibrate Vision Profile</button>
+                        </div>
+                        <div class="form-group">
+                        <label>Support & Feedback</label>
+                        <p class="settings-description">
+                         For more information, to report an issue, or to provide feedback, please 
+                        <a href="https://drishtiai-website.vercel.app/contact" target="_blank" class="text-link">visit our official website</a>.
+                        </p>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="modal-footer"><button id="save-settings-btn" class="primary-btn">Save Settings</button></div>
+        </div>
+    </div>
+
+    <!-- Session Report Modal -->
+    <div id="session-report-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button id="close-session-report-btn" class="close-btn">&times;</button>
+            <div id="session-report-loader"><h2>Generating Your Report...</h2><div class="spinner"></div></div>
+            <div id="session-report-content" class="hidden">
+                 <h2>Session Summary</h2>
+                 <p><strong>Active Time:</strong> <span id="report-active-time">--</span></p><hr>
+                 <h3>Goal Achievement</h3>
+                 <div id="report-goal-achievement"></div><hr>
+                 <h3>Performance vs. Historical Average</h3>
+                 <div id="report-performance"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CALIBRATION MODAL STRUCTURE -->
+    <div id="calibration-modal" class="modal-overlay hidden">
+        <div class="modal-content" style="text-align: center;">
+            <h2>Vision Profile Calibration</h2>
+            <p>To ensure accuracy, we need to calibrate the app to your unique face and environment.</p>
+            
+            <!-- === NEW: Name input added to Calibration === -->
+            <div class="form-group" style="margin-top: 1.5rem;">
+                <label for="user-name-calibration" style="text-align: left;">To get started, what should we call you?</label>
+                <input type="text" id="user-name-calibration" placeholder="e.g., Alex">
+            </div>
+
+            <p>Please look directly at your camera and follow the on-screen instructions.</p>
+            <div id="calibration-status" style="margin: 1.5rem 0; font-weight: 500;">Ready when you are.</div>
+            <button id="start-calibration-btn" class="primary-btn">Start Calibration</button>
+        </div>
+    </div>
+
+    <script src="/static/dashboard.js"></script>
+</body>
+</html>

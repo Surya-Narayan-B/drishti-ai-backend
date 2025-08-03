@@ -1,0 +1,4 @@
+.env
+# Ignore PyInstaller output folders
+/dist
+/build
