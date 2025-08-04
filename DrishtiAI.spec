@@ -15,8 +15,6 @@ a = Analysis(
     # Add all your data files and folders here
     datas=[
         ('wellness_assistant.py', '.'),
-        ('calibration_profile.json', '.'),
-        ('monitoring_data.db', '.'),
         ('templates', 'templates'),
         ('static', 'static'),
         (pyttsx3_drivers_path, 'pyttsx3/drivers') # Dynamically add the drivers

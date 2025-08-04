@@ -10,17 +10,13 @@ import os
 import sqlite3
 from datetime import datetime, timedelta
 import threading
-from dotenv import load_dotenv
-load_dotenv() # This line loads the .env file
+import requests
 
 # --- Local Module Imports ---
 import wellness_assistant
 
 # --- Flask Imports for Web Server ---
 from flask import Flask, jsonify, render_template, request
-
-# --- Google Gemini AI Imports ---
-import google.generativeai as genai
 
 # --- Dependency Checks ---
 try:
@@ -39,11 +35,6 @@ except Exception as e:
     print(f"[WARNING] pyttsx3 initialization failed: {e}. Voice alerts will be disabled.")
     PYTTSX_AVAILABLE = False
 
-# --- Gemini AI Configuration ---
-# IMPORTANT: Replace with your actual API key
-YOUR_API_KEY = os.getenv("GEMINI_API_KEY")
-genai.configure(api_key=YOUR_API_KEY)
-model = genai.GenerativeModel('gemini-2.0-flash')
 
 # --- MediaPipe and Calculation Functions ---
 mp_face_mesh = mp.solutions.face_mesh
@@ -275,6 +266,7 @@ def run_calibration_process(user_name=None):
 # --- Main Monitoring Loop ---
 # --- Main Monitoring Loop ---
 def run_monitoring_loop():
+    print("\n\n--- THIS IS THE LATEST VERSION OF THE CODE. IF YOU SEE THIS, THE FILE IS CORRECT. ---\n\n")
     global monitoring_active, yawn_count, blink_count, active_time_sec, idle_time_sec, blink_rate_bpm, is_gaze_centered, user_status, last_status_change_time, current_session_id, session_start_time_iso,drowsiness_score
     
     yawn_count = 0; blink_count = 0; active_time_sec = 0; idle_time_sec = 0
@@ -320,7 +312,8 @@ def run_monitoring_loop():
             if on_break:
                 time_left = BREAK_DURATION_SEC - (current_time - break_start_time)
                 if time_left > 0:
-                    cv2.putText(frame, "BREAK TIME!", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 255), 3); cv2.putText(frame, f"Resuming in: {int(time_left)}s", (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2); cv2.imshow('Eye Monitoring', frame)
+                    cv2.putText(frame, "BREAK TIME!", (50, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 255), 3); cv2.putText(frame, f"Resuming in: {int(time_left)}s", (50, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+                    # cv2.imshow('Eye Monitoring', frame)
                     if cv2.waitKey(1) & 0xFF == ord('q'): monitoring_active = False
                     continue
                 else: on_break = False; last_break_time = current_time
@@ -450,7 +443,7 @@ def run_monitoring_loop():
             debug_text = f"Y Delta: {y_delta:.3f} / Up Threshold: {up_threshold:.3f}"
             cv2.putText(frame, debug_text, (30, 150), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
 
-            cv2.imshow('Eye Monitoring', frame)
+            # cv2.imshow('Eye Monitoring', frame)
             key = cv2.waitKey(1) & 0xFF
             if key == ord('q'):
                 monitoring_active = False
@@ -632,23 +625,15 @@ def save_settings():
         conn.commit(); conn.close()
         return jsonify({"status": "success", "message": "Settings saved."}), 200
     except Exception as e: return jsonify({"error": str(e)}), 500
+
 @app.route('/api/chat', methods=['POST'])
 def chat_with_gemini():
     global conversation_history # Access the global list
     try:
         user_message = request.json['message']
-        
-        # Add the user's message to the history
-        conversation_history.append(f"User: {user_message}")
 
-        # Limit history to the last 10 messages to keep the prompt size reasonable
-        if len(conversation_history) > 20:
-            conversation_history = conversation_history[-20:]
-            
-        # Format the history for the prompt
-        history_for_prompt = "\n".join(conversation_history)
-
-        # --- Your existing code to get user data ---
+        # --- 1. GATHER ALL DATA LOCALLY ---
+        # This data-gathering code is the same as before. It stays here!
         conn = sqlite3.connect(DB_FILE, check_same_thread=False); cursor = conn.cursor()
         cursor.execute("SELECT user_name FROM settings WHERE id = 1")
         user_name_result = cursor.fetchone()
@@ -663,52 +648,37 @@ def chat_with_gemini():
         conn.close()
         user_stats = { "avg_bpm": int(avg_bpm), "health_score": health_score, "fatigue_hotspot_hour": fatigue_hotspot_hour }
         
-        # --- Updated prompt with conversation history ---
-        prompt = f"""
-        You are DrishtiAI, a gentle and supportive wellness companion. Your user's name is {user_name}.
+        # --- 2. PACKAGE THE DATA TO SEND TO THE SERVER ---
+        # The complex prompt is GONE from this file. We just package the data.
+        payload = {
+            'message': user_message,
+            'history': conversation_history,
+            'user_name': user_name,
+            'stats': user_stats
+        }
 
-        Core Identity:
-        - You ARE DrishtiAI. Do not introduce yourself in every message. Assume the user knows who you are.
-        - Your tone is always warm, empathetic, and kind, like a caring friend.
-        - You are capable of answering general knowledge questions, but always try to gently guide the conversation back to wellness, well-being, or your core functionalities.
-
-        This is the recent conversation history:
-        {history_for_prompt}
-
-        User's NEW Message: "{user_message}"
-
-        Context Data (Only use if relevant to the conversation):
-        - Average Blink Rate: {user_stats['avg_bpm']} BPM
-        - Screen Health Score: {user_stats['health_score']}/100
-        - Common Fatigue Time: {user_stats['fatigue_hotspot_hour']}
-
-        Behavior Rules:
-        - If the user sounds stressed or tired, respond with calming and reassuring words. Offer a simple breathing exercise.
-        - If the user sounds happy, match their energy with light, encouraging, and slightly playful support.
-        - If the user asks a factual question that is NOT directly related to wellness (e.g., "who is X?", "what is Y?"), answer it concisely and accurately. After answering, gently pivot back to their well-being or offer a wellness tip. For example: "X is [brief explanation]. Speaking of focus, how are your eyes feeling today, {user_name}?" or "Y is [brief explanation]. Remember to take short breaks for your eyes throughout the day!"
-        - If the user's message is unclear, gibberish, or just a simple greeting, respond with a gentle check-in. Examples: "Hey {user_name}, how's your energy today?" or "Everything okay? I'm here to listen."
-        - NEVER respond to unclear messages by re-introducing yourself.
-        - Be concise. Keep your replies to 2-3 short sentences.
-        - Avoid using the user's name({user_name}) repeatedly. Only use it at the start of a conversation or when absolutely necessary — such as in emotionally significant moments or when clearly addressing the user in a group or public setting. In normal back-and-forth replies, do not use the name at all. Overuse feels robotic and insincere.
-        """
+        # --- 3. CALL YOUR SECURE VERCEL SERVER ---
+        # !!! IMPORTANT: Replace "your-frontend-project-name" with the actual name of your Vercel project !!!
+        VERCEL_API_URL = "https://drishtiai-website.vercel.app/api/chat" 
         
-        response = model.generate_content(prompt)
-        
-        # Add the bot's response to the history, with error checking
-        bot_reply = ""
-        if response.parts:
-            bot_reply = response.text
-        else:
-            bot_reply = "I'm sorry, I couldn't generate a response for that. It may have triggered my safety filters."
-            print("[ERROR] Gemini response was blocked or empty.")
+        response = requests.post(VERCEL_API_URL, json=payload, timeout=30) # Added a 30-second timeout
+        response.raise_for_status() # This will raise an error if the server returns 4xx or 5xx
 
-        conversation_history.append(f"AI: {bot_reply}")
+        # --- 4. RECEIVE AND PROCESS THE REPLY FROM YOUR SERVER ---
+        data = response.json()
+        bot_reply = data.get('reply')
+        
+        # The server now manages the history, so we get the updated version from it
+        conversation_history = data.get('history', []) 
 
         return jsonify({'reply': bot_reply})
         
+    except requests.exceptions.RequestException as e:
+        print(f"[ERROR] API request to Vercel proxy failed: {e}")
+        return jsonify({'reply': "Sorry, I can't reach the chat service. Please check your internet connection."}), 500
     except Exception as e:
-        print(f"[ERROR] Gemini API call failed: {e}")
-        return jsonify({'reply': "Sorry, I'm having trouble connecting to the AI service right now. Please try again later."}), 500
+        print(f"[ERROR] Chat handler failed: {e}")
+        return jsonify({'reply': "An unexpected error occurred. Please try again later."}), 500
 
 def run_flask_app():
     # This line triggers the browser to open automatically
