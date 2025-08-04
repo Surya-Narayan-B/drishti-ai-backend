@@ -89,8 +89,22 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
-CONFIG_FILE = resource_path("calibration_profile.json")
-DB_FILE = resource_path("monitoring_data.db")
+
+def get_user_data_path(file_name):
+    """
+    Get absolute path to a file in the user's data directory.
+    USE THIS FOR USER-GENERATED DATA (e.g., database, settings, logs).
+    """
+    # Use os.path.expanduser('~') to find the user's home directory
+    app_data_dir = os.path.join(os.path.expanduser('~'), '.DrishtiAI')
+    
+    # Create the directory if it doesn't exist
+    os.makedirs(app_data_dir, exist_ok=True)
+        
+    return os.path.join(app_data_dir, file_name)
+
+CONFIG_FILE = get_user_data_path("calibration_profile.json")
+DB_FILE = get_user_data_path("monitoring_data.db")
 # --- END OF REPLACEMENT ---
 
 # --- Global State Variables ---
@@ -703,8 +717,9 @@ def run_flask_app():
 
 # --- Main Execution Block ---
 if __name__ == '__main__':
-    setup_database()
-    
+    if not os.path.exists(DB_FILE):
+        print("[INFO] No database found. Creating a new one for this user.")
+        setup_database()
     print("Application ready. Starting web server...")
     print("Open your browser to http://localhost:5000 to control the application.")
     run_flask_app()

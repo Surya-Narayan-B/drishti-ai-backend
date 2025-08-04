@@ -2,3 +2,10 @@
 # Ignore PyInstaller output folders
 /dist
 /build
+# Ignore personal user data
+calibration_profile.json
+monitoring_data.db
+
+# Python cache
+__pycache__/
+*.pyc
